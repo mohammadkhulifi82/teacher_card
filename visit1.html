@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بطاقة زيارة المعلم</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background-color: #f4f7f6; 
+            padding: 20px; 
+            font-size: 15px; 
+            margin: 0; 
+            box-sizing: border-box;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        
+        /* Navigation Bar */
+        .navbar { background-color: #0056b3; padding: 15px; text-align: center; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .navbar button { background-color: #fff; color: #0056b3; border: none; padding: 10px 20px; font-size: 16px; margin: 0 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit; transition: 0.3s; }
+        .navbar button:hover { background-color: #e9ecef; }
+        .navbar button.active { background-color: #ffc107; color: #333; }
+
+        /* Pages */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* Card Design */
+        .card { background-color: #fff; max-width: 950px; margin: auto; padding: 30px; border: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2, h3 { text-align: center; color: #333; margin-top: 0; }
+        
+        .header-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .header-grid div { display: flex; align-items: center; }
+        .header-grid label { font-weight: bold; margin-left: 10px; white-space: nowrap; }
+        .header-grid input { flex: 1; border: none; border-bottom: 1px dashed #666; font-family: inherit; font-size: 15px; padding: 5px; outline: none; background: transparent; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #333; padding: 10px; text-align: right; vertical-align: middle; }
+        th { background-color: #e9ecef; text-align: center; font-weight: bold; }
+        
+        .section-title { background-color: #d1ecf1; font-weight: bold; text-align: right; padding: 10px; border: 1px solid #333; margin-top: 20px; border-bottom: none; }
+        
+        input[list], input[type="text"] { width: 100%; box-sizing: border-box; font-family: inherit; }
+        input[list] { padding: 8px; border: 1px solid #b3b3b3; border-radius: 4px; font-size: 14px; background-color: #fffbc4; }
+        textarea { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #b3b3b3; border-radius: 4px; font-family: inherit; min-height: 60px; resize: vertical; background-color: #fffbc4; }
+        input:focus, textarea:focus { border-color: #0056b3; background-color: #fff; outline: none; }
+        
+        .btn-print { display: block; width: 100%; padding: 15px; font-size: 18px; color: #fff; background-color: #28a745; border: none; border-radius: 5px; cursor: pointer; margin-top: 30px; font-family: inherit; }
+        .btn-print:hover { background-color: #218838; }
+
+        /* Custom spacing classes to replace inline styles */
+        .topic-row { display: flex; align-items: center; margin-bottom: 15px; }
+        .textarea-container { margin-bottom: 15px; }
+
+        /* Signatures Section */
+        .signatures { display: flex; justify-content: space-around; margin-top: 30px; margin-bottom: 20px; text-align: center; }
+        .signatures div { width: 40%; }
+        .signatures h4 { margin-bottom: 40px; color: #333; font-size: 16px; }
+        .signatures .dotted-line { border-bottom: 2px dotted #333; width: 80%; margin: 0 auto; }
+
+        /* Settings Page Styles */
+        .settings-container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .group-title { background-color: #343a40; color: #fff; padding: 10px; border-radius: 5px; margin-top: 30px; text-align: center; }
+        .setting-group { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; }
+        .setting-group h4 { margin-top: 0; color: #0056b3; text-align: right; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
+        .tag-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .tag { background-color: #e9ecef; border: 1px solid #ccc; padding: 5px 10px; border-radius: 3px; display: flex; align-items: center; gap: 8px; }
+        .tag button { background-color: #dc3545; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .tag button:hover { background-color: #c82333; }
+        .add-item { display: flex; gap: 10px; }
+        .add-item input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 14px;}
+        .add-item button { padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; font-weight: bold;}
+        .add-item button:hover { background-color: #218838; }
+
+        @page {
+            size: A4 portrait;
+            /* تقليل الهوامش لأقصى حد مسموح لضمان استيعاب الصفحة لكل المحتوى */
+            margin: 5mm 10mm; 
+        }
+
+        @media print {
+            body { 
+                background: #fff; 
+                padding: 0 !important; 
+                margin: 0 !important;
+                /* تصغير الخط وتقارب الأسطر بشكل أكبر */
+                font-size: 10.5pt !important; 
+                line-height: 1.2 !important;
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+            }
+            .navbar, .btn-print, #settingsPage { display: none !important; }
+            #formPage { display: block !important; }
+            
+            .card { 
+                box-shadow: none !important; 
+                border: none !important; 
+                padding: 0 !important; 
+                margin: 0 !important; 
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            /* تقليص صارم للمسافات الرأسية */
+            h2 { margin-bottom: 5px !important; margin-top: 0 !important; font-size: 14pt !important; }
+            
+            .header-grid { gap: 4px 10px !important; margin-bottom: 8px !important; }
+            .header-grid label { font-size: 10pt !important; }
+            .header-grid input { padding: 1px !important; }
+            
+            .topic-row { margin-bottom: 8px !important; }
+            .topic-row label, .topic-row input { font-size: 10pt !important; }
+
+            table { margin-bottom: 8px !important; }
+            /* ضغط الخلايا داخل الجدول */
+            th, td { padding: 2px 4px !important; font-size: 9.5pt !important; } 
+            
+            .section-title { margin-top: 5px !important; padding: 4px !important; font-size: 10.5pt !important; }
+            
+            input[list], textarea, input { 
+                background-color: transparent !important; 
+                border: none !important; 
+                resize: none; 
+                padding: 0 !important;
+                font-size: 9.5pt !important;
+            }
+            input { border-bottom: 1px dashed #000 !important; }
+            ::-webkit-calendar-picker-indicator { display: none !important; }
+            
+            /* تحديد ارتفاع خانات الملاحظات لمنعها من دفع التوقيع للأسفل */
+            .textarea-container { margin-bottom: 5px !important; }
+            .textarea-container label { margin-bottom: 2px !important; font-size: 10pt !important;}
+            textarea { 
+                min-height: 35px !important; 
+                height: 35px !important; 
+                overflow: hidden !important;
+            }
+            
+            /* ضغط منطقة التوقيعات */
+            .signatures { margin-top: 10px !important; margin-bottom: 0 !important;}
+            .signatures h4 { margin-bottom: 20px !important; font-size: 11pt !important; margin-top:0 !important; }
+
+            /* منع انقسام العناصر عبر الصفحات */
+            tr, td, th, .signatures, .header-grid, .section-title { page-break-inside: avoid !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<div class="navbar">
+    <button id="btn-form" class="active" onclick="switchPage('formPage')">📄 استمارة التقييم</button>
+    <button id="btn-settings" onclick="switchPage('settingsPage')">⚙️ إعدادات القوائم المنسدلة للبنود</button>
+</div>
+
+<!-- ======================= MAIN FORM PAGE ======================= -->
+<div id="formPage" class="page active">
+    <div class="card">
+        <h2>بطاقة زيارة المعلم</h2>
+
+        <!-- Header Information -->
+        <div class="header-grid">
+            <div><label>المدرســــــــــة:</label><input type="text"></div>
+            <div><label>الفصل الدراسي:</label><input type="text"></div>
+            <div><label>العام الدراسي:</label><input type="text" placeholder="مثال: 2026 / 2027 م"></div>
+            
+            <div><label>اسم المعلم:</label><input type="text"></div>
+            <div><label>الصف والفصــل:</label><input type="text"></div>
+            <div><label>اليوم والتاريخ:</label><input type="text" placeholder="   /   / 20 م"></div>
+            
+            <div><label>رقم الزيارة:</label><input type="text"></div>
+            <div><label>عـــــــــدد المتعلمين:</label><input type="text"></div>
+            <div><label>الحصة:</label><input type="text"></div>
+        </div>
+        
+        <div class="topic-row">
+            <label style="font-weight: bold; margin-left: 10px;">موضوع الدرس:</label>
+            <input type="text" style="flex: 1; border: none; border-bottom: 1px dashed #666; padding: 5px; outline: none; font-family: inherit;">
+            <label style="margin-right: 20px; font-weight: bold;">( ) متفق &nbsp;&nbsp; ( ) متقدم &nbsp;&nbsp; ( ) متأخر</label>
+        </div>
+
+        <!-- Section 1 -->
+        <div class="section-title">أولاً : تهيئة المعلم للحصة الدراسية</div>
+        <table>
+            <tr>
+                <th width="5%">م</th>
+                <th width="25%">البند</th>
+                <th width="20%">مدى تحققه</th>
+                <th width="5%">م</th>
+                <th width="25%">البند</th>
+                <th width="20%">نسبة تحققه</th>
+            </tr>
+            <tr>
+                <td style="text-align: center;">1</td>
+                <td>بيانات الحصة</td>
+                <td><input type="text" list="data-1" placeholder="اختر أو اكتب..."></td>
+                <td style="text-align: center;">3</td>
+                <td>المظهر العام</td>
+                <td><input type="text" list="data-3" placeholder="اختر أو اكتب..."></td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">2</td>
+                <td>نظافة المختبر وجاهزيته</td>
+                <td><input type="text" list="data-2" placeholder="اختر أو اكتب..."></td>
+                <td style="text-align: center;">4</td>
+                <td>تفعيل سجل المتابعه</td>
+                <td><input type="text" list="data-4" placeholder="اختر أو اكتب..."></td>
+            </tr>
+        </table>
+
+        <!-- Section 2 -->
+        <div class="section-title">ثانياً : كفايات الحصة الدراسية</div>
+        <table>
+            <tr>
+                <th width="15%">الكفاية</th>
+                <th width="40%">البنود</th>
+                <th width="45%">تعليق وصفي (اختر من القائمة أو أضف يدوياً)</th>
+            </tr>
+            
+            <!-- أداء المعلم -->
+            <tr>
+                <td rowspan="8" style="text-align: center; font-weight: bold;">أداء المعلم</td>
+                <td>التحضير وبنوده ومطابقته مع الأداء</td>
+                <td><input type="text" list="eval-1" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>سلامة المادة العلمية والتمكن منها</td>
+                <td><input type="text" list="eval-2" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>تنوع طرق التدريس والأنشطة المصاحبة</td>
+                <td><input type="text" list="eval-3" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>تنظيم محتوى الدرس وترابط عناصره</td>
+                <td><input type="text" list="eval-4" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>الاستخدام السليم للغة العربية والمصطلحات الحاسوبية</td>
+                <td><input type="text" list="eval-5" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>جودة الوسائل التعليمية المستخدمة وتوظيفها</td>
+                <td><input type="text" list="eval-6" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>استثمار وقت الحصة بكفاءة</td>
+                <td><input type="text" list="eval-7" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>إدارة الفصل وحسن التصرف</td>
+                <td><input type="text" list="eval-8" placeholder="اختر التقييم..."></td>
+            </tr>
+
+            <!-- دعم المتعلمين -->
+            <tr>
+                <td rowspan="4" style="text-align: center; font-weight: bold;">دعم المتعلمين</td>
+                <td>مراعاة الفروق الفردية للمتعلمين</td>
+                <td><input type="text" list="eval-9" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>إتاحة الفرصة لتفاعل ومشاركة المتعلمين</td>
+                <td><input type="text" list="eval-10" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>تحفيز وإثارة دافعية التعلم</td>
+                <td><input type="text" list="eval-11" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>العلاقة الطيبة مع المتعلمين واحترامهم</td>
+                <td><input type="text" list="eval-12" placeholder="اختر التقييم..."></td>
+            </tr>
+
+            <!-- التقويم -->
+            <tr>
+                <td rowspan="2" style="text-align: center; font-weight: bold;">التقويم</td>
+                <td>تطبيق المتعلمين لأوراق العمل ونسبته</td>
+                <td><input type="text" list="eval-13" placeholder="اختر التقييم..."></td>
+            </tr>
+            <tr>
+                <td>شمولية التقويم وتنوعه</td>
+                <td><input type="text" list="eval-14" placeholder="اختر التقييم..."></td>
+            </tr>
+        </table>
+
+        <div class="textarea-container">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">الاستجابة للتوجيهات وتنفيذها:</label>
+            <textarea placeholder="اكتب هنا..."></textarea>
+        </div>
+
+        <div class="textarea-container">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">الملاحظات والتوصيات:</label>
+            <textarea style="min-height: 80px;" placeholder="اكتب الملاحظات والتوصيات هنا..."></textarea>
+        </div>
+
+        <!-- قسم التوقيعات -->
+        <div class="signatures">
+            <div>
+                <h4>توقيع المعلم</h4>
+                <div class="dotted-line"></div>
+            </div>
+            <div>
+                <h4>توقيع رئيس الشعبة</h4>
+                <div class="dotted-line"></div>
+            </div>
+        </div>
+
+        <button class="btn-print" onclick="window.print()">🖨️ حفظ كـ PDF أو طباعة الاستمارة</button>
+    </div>
+</div>
+
+<!-- ======================= SETTINGS PAGE ======================= -->
+<div id="settingsPage" class="page">
+    <div class="settings-container">
+        <h2 style="text-align:center; color: #333; margin-bottom: 10px;">تخصيص القوائم المنسدلة لكل بند</h2>
+        <p style="text-align:center; color: #666; margin-bottom: 30px;">يمكنك هنا إضافة أو حذف الخيارات الخاصة بكل قائمة منسدلة لكل بند على حدة.</p>
+        
+        <div id="settings-content"></div>
+    </div>
+</div>
+
+<!-- Datalists Container -->
+<div id="datalists-container"></div>
+
+<script>
+    // --- 1. إعدادات القوائم لكل بند على حدة ---
+    const defaultDropdowns = {
+        // أولاً: تهيئة المعلم
+        "data-1": { group: "أولاً: تهيئة المعلم للحصة الدراسية", title: "بيانات الحصة", items: ["كاملة", "ناقصة", "غير موجودة"] },
+        "data-2": { group: "أولاً: تهيئة المعلم للحصة الدراسية", title: "نظافة المختبر وجاهزيته", items: ["ممتاز", "جيد", "ضعيف"] },
+        "data-3": { group: "أولاً: تهيئة المعلم للحصة الدراسية", title: "المظهر العام", items: ["مناسب", "يلزم مراعاته"] },
+        "data-4": { group: "أولاً: تهيئة المعلم للحصة الدراسية", title: "تفعيل سجل المتابعه", items: ["متابع", "غير متابع", "لا يوجد"] },
+        
+        // ثانياً: أداء المعلم
+        "eval-1": { group: "ثانياً: أداء المعلم", title: "التحضير وبنوده ومطابقته مع الأداء", items: ["مطابق", "غير مطابق", "إلى حد ما"] },
+        "eval-2": { group: "ثانياً: أداء المعلم", title: "سلامة المادة العلمية والتمكن منها", items: ["متمكن", "غير متمكن"] },
+        "eval-3": { group: "ثانياً: أداء المعلم", title: "تنوع طرق التدريس والأنشطة المصاحبة", items: ["متنوعة ومناسبة", "تحتاج تنويع"] },
+        "eval-4": { group: "ثانياً: أداء المعلم", title: "تنظيم محتوى الدرس وترابط عناصره", items: ["منظم ومترابط", "غير مترابط"] },
+        "eval-5": { group: "ثانياً: أداء المعلم", title: "الاستخدام السليم للغة العربية والمصطلحات الحاسوبية", items: ["يستخدم لغة عربية ومصطلحات حاسوبية", "لا يستخدم"] },
+        "eval-6": { group: "ثانياً: أداء المعلم", title: "جودة الوسائل التعليمية المستخدمة وتوظيفها", items: ["جيدة وموظفة", "غير موظفة"] },
+        "eval-7": { group: "ثانياً: أداء المعلم", title: "استثمار وقت الحصة بكفاءة", items: ["مستثمر بكفاءة", "غير مستثمر"] },
+        "eval-8": { group: "ثانياً: أداء المعلم", title: "إدارة الفصل وحسن التصرف", items: ["جيدة", "تحتاج تحسين"] },
+        
+        // ثانياً: دعم المتعلمين
+        "eval-9": { group: "ثانياً: دعم المتعلمين", title: "مراعاة الفروق الفردية للمتعلمين", items: ["يراعي", "لا يراعي"] },
+        "eval-10": { group: "ثانياً: دعم المتعلمين", title: "إتاحة الفرصة لتفاعل ومشاركة المتعلمين", items: ["متاحة بشكل جيد", "غير متاحة"] },
+        "eval-11": { group: "ثانياً: دعم المتعلمين", title: "تحفيز وإثارة دافعية التعلم", items: ["محفز", "غير محفز"] },
+        "eval-12": { group: "ثانياً: دعم المتعلمين", title: "العلاقة الطيبة مع المتعلمين واحترامهم", items: ["علاقة طيبة ومتبادلة", "تحتاج تحسين"] },
+        
+        // ثانياً: التقويم
+        "eval-13": { group: "ثانياً: التقويم", title: "تطبيق المتعلمين لأوراق العمل ونسبته", items: ["مطبق", "غير مطبق"] },
+        "eval-14": { group: "ثانياً: التقويم", title: "شمولية التقويم وتنوعه", items: ["شامل ومتنوع", "غير شامل"] }
+    };
+
+    let appDropdowns = {};
+
+    // --- 2. تحميل البيانات أو استخدام الافتراضي ---
+    function loadData() {
+        const stored = localStorage.getItem('teacherCardItemDropdowns');
+        if (stored) {
+            appDropdowns = JSON.parse(stored);
+        } else {
+            appDropdowns = JSON.parse(JSON.stringify(defaultDropdowns));
+        }
+        renderDatalists();
+        renderSettings();
+    }
+
+    function saveData() {
+        localStorage.setItem('teacherCardItemDropdowns', JSON.stringify(appDropdowns));
+        renderDatalists();
+        renderSettings();
+    }
+
+    // --- 3. توليد القوائم المنسدلة برمجياً المخفية ---
+    function renderDatalists() {
+        const container = document.getElementById('datalists-container');
+        container.innerHTML = '';
+        
+        for (let key in appDropdowns) {
+            const datalist = document.createElement('datalist');
+            datalist.id = key;
+            appDropdowns[key].items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item;
+                datalist.appendChild(option);
+            });
+            container.appendChild(datalist);
+        }
+    }
+
+    // --- 4. بناء صفحة الإعدادات وتجميعها حسب القسم ---
+    function renderSettings() {
+        const container = document.getElementById('settings-content');
+        container.innerHTML = '';
+
+        let currentGroup = '';
+
+        for (let key in appDropdowns) {
+            // إضافة عنوان للمجموعة إذا تغيرت
+            if (appDropdowns[key].group !== currentGroup) {
+                currentGroup = appDropdowns[key].group;
+                const groupHeader = document.createElement('h2');
+                groupHeader.className = 'group-title';
+                groupHeader.innerText = currentGroup;
+                container.appendChild(groupHeader);
+            }
+
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'setting-group';
+            
+            const title = document.createElement('h4');
+            title.innerText = appDropdowns[key].title;
+            groupDiv.appendChild(title);
+
+            const tagList = document.createElement('div');
+            tagList.className = 'tag-list';
+            appDropdowns[key].items.forEach((item, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'tag';
+                tag.innerHTML = `<span>${item}</span> <button onclick="removeItem('${key}', ${index})" title="حذف">✖</button>`;
+                tagList.appendChild(tag);
+            });
+            groupDiv.appendChild(tagList);
+
+            const addDiv = document.createElement('div');
+            addDiv.className = 'add-item';
+            addDiv.innerHTML = `
+                <input type="text" id="input-${key}" placeholder="أضف خياراً جديداً لهذه القائمة..." onkeypress="handleEnter(event, '${key}')">
+                <button onclick="addItem('${key}')">➕ إضافة</button>
+            `;
+            groupDiv.appendChild(addDiv);
+
+            container.appendChild(groupDiv);
+        }
+    }
+
+    // --- 5. وظائف الإضافة والحذف ---
+    function addItem(key) {
+        const input = document.getElementById(`input-${key}`);
+        const value = input.value.trim();
+        if (value !== "") {
+            appDropdowns[key].items.push(value);
+            input.value = "";
+            saveData();
+        }
+    }
+
+    function handleEnter(event, key) {
+        if (event.key === 'Enter') addItem(key);
+    }
+
+    function removeItem(key, index) {
+        appDropdowns[key].items.splice(index, 1);
+        saveData();
+    }
+
+    // --- 6. التنقل بين الصفحات ---
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        
+        document.getElementById('btn-form').classList.remove('active');
+        document.getElementById('btn-settings').classList.remove('active');
+        
+        if (pageId === 'formPage') {
+            document.getElementById('btn-form').classList.add('active');
+        } else {
+            document.getElementById('btn-settings').classList.add('active');
+        }
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>
